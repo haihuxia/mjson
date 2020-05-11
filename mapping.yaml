@@ -1,0 +1,10 @@
+mapping:
+  - group:
+      name: nick
+    pairs:
+      first: fname
+      last: lname
+  - pairs:
+      children: childs
+  - pairs:
+      friends.first: xxxx
