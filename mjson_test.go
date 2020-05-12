@@ -24,7 +24,7 @@ func TestMappingFromYAML(t *testing.T) {
 		t.Errorf("read file failed: %v", err)
 		return
 	}
-	spec := &spec{}
+	spec := &Spec{}
 	err = yaml.Unmarshal(buff, spec)
 	if err != nil {
 		t.Errorf("unmarshal %s to yaml failed: %v", buff, err)

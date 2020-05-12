@@ -6,5 +6,6 @@ mapping:
       last: lname
   - pairs:
       children: childs
+      age: my_age
   - pairs:
-      friends.first: xxxx
+      friends.first: fname

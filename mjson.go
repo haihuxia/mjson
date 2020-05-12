@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	spec struct {
+	Spec struct {
 		MappingConfig []*mappingConfig `yaml:"mapping"`
 	}
 
@@ -36,16 +36,7 @@ func MappingString(json, path, val string) string {
 	return c.json
 }
 
-func MappingYAML(json string, filePath string) string {
-	buff, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return json
-	}
-	spec := &spec{}
-	err = yaml.Unmarshal(buff, spec)
-	if err != nil {
-		return json
-	}
+func MappingSpec(json string, spec *Spec) string {
 	c := &parseContext{json: json}
 	for _, val := range spec.MappingConfig {
 		if val.Group != nil {
@@ -61,6 +52,19 @@ func MappingYAML(json string, filePath string) string {
 		}
 	}
 	return c.json
+}
+
+func MappingYAML(json string, filePath string) string {
+	buff, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return json
+	}
+	spec := &Spec{}
+	err = yaml.Unmarshal(buff, spec)
+	if err != nil {
+		return json
+	}
+	return MappingSpec(json, spec)
 }
 
 func mappingContext(c *parseContext, m map[string]string) string {
@@ -139,7 +143,9 @@ func parseObject(c *parseContext, rp pathResult, i int) {
 						c.groupIndex = i
 					}
 					if c.val != "_" {
-						c.json = c.json[:i-len(key)-1] + c.val + c.json[i-1:]
+						s := i - len(key) - 1
+						c.json = c.json[:s] + c.val + c.json[i-1:]
+						i = s + len(c.val) + 1
 					}
 					break
 				}
@@ -178,6 +184,7 @@ func parseArray(c *parseContext, rp pathResult, i int) {
 		if c.json[i] == '{' {
 			i++
 			parseObject(c, rp, i)
+			i = jumpObject(c.json, i)
 		} else if c.json[i] == ']' {
 			break
 		}
@@ -247,4 +254,3 @@ func jumpArray(json string, i int) int {
 	}
 	return i
 }
-

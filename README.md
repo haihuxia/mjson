@@ -28,9 +28,9 @@ mjson.MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "abc", "my
 // ==> `{"name": {"first": "Tom", "last": "Anderson"}}`
 // Can't find "abc" path map nothing
 
-mjson.MappingString(`{"friends": [{"first": "Dale", "last": "Murphy", "age1": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}}]}`, "friends.nets", "abc_nets")
-// ==> `{"friends": [{"first": "Dale", "last": "Murphy", "age1": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}}]}`
-// Can't find "friends.nets" path map nothing
+mjson.MappingString(`{"friends": [{"first": "Dale", "last": "Murphy", "age": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}}]}`, "friends.nets", "abc_nets")
+// ==> `{"friends": [{"first": "Dale", "last": "Murphy", "age": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}}]}`
+// Can't find "friends.nets" path map nothing, "friends.abc.nets" is the correct.
 ```
 
 * MappingYAML
@@ -46,7 +46,7 @@ mapping:
   - pairs:
       children: childs
   - pairs:
-      friends.first: xxxx
+      friends.first: fname
 ```
 
 ```go
@@ -60,9 +60,9 @@ const json = `{
   "children": ["Sara","Alex","Jack"],
   "fav.movie": "Deer Hunter",
   "friends": [
-    {"first": "Dale", "last": "Murphy", "age1": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}},
-    {"first": "Roger", "last": "Craig", "age1": 68, "abc": {"nets": ["fb", "tw"], "abc": {"bbb": "ccc"}}},
-    {"first": "Jane", "last": "Murphy", "age1": 47, "abc": {"nets": ["ig", "tw"], "abc": {"bbb": "ccc"}}}
+    {"first": "Dale", "last": "Murphy", "age": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}},
+    {"first": "Roger", "last": "Craig", "age": 68, "abc": {"nets": ["fb", "tw"], "abc": {"bbb": "ccc"}}},
+    {"first": "Jane", "last": "Murphy", "age": 47, "abc": {"nets": ["ig", "tw"], "abc": {"bbb": "ccc"}}}
   ]
 }`
 
@@ -80,9 +80,9 @@ This will print:
   "childs": ["Sara","Alex","Jack"],
   "fav.movie": "Deer Hunter",
   "friends": [
-    {"xxxx": "Dale", "last": "Murphy", "age1": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}},
-    {"xxxx": "Roger", "last": "Craig", "age1": 68, "abc": {"nets": ["fb", "tw"], "abc": {"bbb": "ccc"}}},
-    {"xxxx": "Jane", "last": "Murphy", "age1": 47, "abc": {"nets": ["ig", "tw"], "abc": {"bbb": "ccc"}}}
+    {"fname": "Dale", "last": "Murphy", "age": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}},
+    {"fname": "Roger", "last": "Craig", "age": 68, "abc": {"nets": ["fb", "tw"], "abc": {"bbb": "ccc"}}},
+    {"fname": "Jane", "last": "Murphy", "age": 47, "abc": {"nets": ["ig", "tw"], "abc": {"bbb": "ccc"}}}
   ]
 }
 ```
