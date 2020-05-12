@@ -6,7 +6,7 @@ MJSON is a Go package that provides a way to map keys from a json document.
 
 ### Installing
 
-```go
+```
 go get -u github.com/haihuxia/mjson
 ```
 
@@ -14,7 +14,7 @@ go get -u github.com/haihuxia/mjson
 
 * MappingString
 
-```go
+```
 mjson.MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name", "my_name")
 // ==> `{"my_name": {"first": "Tom", "last": "Anderson"}}`
 
