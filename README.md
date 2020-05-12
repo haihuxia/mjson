@@ -1,5 +1,7 @@
 ## MJSON
 
+[![Build Status](https://travis-ci.org/haihuxia/mjson.svg?branch=master)](https://travis-ci.org/haihuxia/mjson)
+
 MJSON is a Go package that provides a way to map keys from a json document.
 
 ### Installing
@@ -19,8 +21,8 @@ mjson.MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name", "m
 mjson.MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name.first", "fname")
 // ==> `{"name": {"fname": "Tom", "last": "Anderson"}}`
 
-mjson.MappingString(`{"friends": [{"first": "Tom", "last": "Anderson"}}, {"first": "Dale", "last": "Murphy"}}]`, "friends.first", "fname")
-// ==> `{"friends": [{"fname": "Tom", "last": "Anderson"}}, {"fname": "Dale", "last": "Murphy"}}]`
+mjson.MappingString(`{"friends": [{"first": "Tom", "last": "Anderson"}, {"first": "Dale", "last": "Murphy"}]}`, "friends.first", "fname")
+// ==> `{"friends": [{"fname": "Tom", "last": "Anderson"}, {"fname": "Dale", "last": "Murphy"}]}`
 ```
 
 
