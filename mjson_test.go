@@ -7,7 +7,7 @@ import (
 )
 
 const json = `{
-  "name": {"first": "last", "last": "Anderson"},
+  "name": {"first": "Tom", "last": "Anderson"},
   "age":37,
   "children": ["Sara","Alex","Jack"],
   "fav.movie": "Deer Hunter",
@@ -24,26 +24,26 @@ func TestMappingFromYAML(t *testing.T) {
 		t.Errorf("read file failed: %v", err)
 		return
 	}
-	spec := &Spec{}
+	spec := &spec{}
 	err = yaml.Unmarshal(buff, spec)
 	if err != nil {
 		t.Errorf("unmarshal %s to yaml failed: %v", buff, err)
 		return
 	}
-	c := &ParseContext{json: json}
+	c := &parseContext{json: json}
 	for _, val := range spec.MappingConfig {
 		if val.Group != nil {
 			c.group = true
-			MappingContext(c, *val.Group)
+			mappingContext(c, *val.Group)
 			for k, v := range *val.Group {
 				t.Logf("key: %s, val: %v", k, v)
 			}
 		}
 		if val.Pairs != nil {
 			if c.group {
-				MappingGroup(c, *val.Pairs)
+				mappingGroup(c, *val.Pairs)
 			} else {
-				MappingContext(c, *val.Pairs)
+				mappingContext(c, *val.Pairs)
 			}
 			for k1, v1 := range *val.Pairs {
 				t.Logf("k1: %s, v1: %s", k1, v1)
@@ -51,6 +51,26 @@ func TestMappingFromYAML(t *testing.T) {
 		}
 	}
 	t.Log(c.json)
+}
+
+func TestMapping(t *testing.T) {
+	jsonStr := MappingString(json, "name", "my_name")
+
+	jsonStr = MappingString(jsonStr, "name.last", "my_name")
+
+	jsonStr = MappingString(jsonStr, "friends.first", "first_name")
+
+	jsonStr = MappingString(jsonStr, "friends.abc.nets", "abc_nets")
+
+	t.Log(jsonStr)
+
+	t.Log(MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name", "my_name"))
+
+	t.Log(MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name.first", "fname"))
+
+	t.Log(MappingString(
+		`{"friends": [{"first": "Tom", "last": "Anderson"}}, {"first": "Dale", "last": "Murphy"}}]`,
+		"friends.first", "fname"))
 }
 
 func TestMappingYAML(t *testing.T) {

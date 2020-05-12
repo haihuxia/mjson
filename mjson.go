@@ -6,11 +6,11 @@ import (
 )
 
 type (
-	Spec struct {
-		MappingConfig []*MappingConfig `yaml:"mapping"`
+	spec struct {
+		MappingConfig []*mappingConfig `yaml:"mapping"`
 	}
 
-	MappingConfig struct {
+	mappingConfig struct {
 		Group *map[string]string `yaml:"group"`
 		Pairs *map[string]string `yaml:"pairs"`
 	}
@@ -21,7 +21,7 @@ type (
 		more bool
 	}
 
-	ParseContext struct {
+	parseContext struct {
 		json       string
 		val        string
 		groupIndex int
@@ -29,34 +29,41 @@ type (
 	}
 )
 
+func MappingString(json, path, val string) string {
+	c := &parseContext{json: json}
+	var i int
+	mappingPairs(c, path, val, i)
+	return c.json
+}
+
 func MappingYAML(json string, filePath string) string {
 	buff, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return json
 	}
-	spec := &Spec{}
+	spec := &spec{}
 	err = yaml.Unmarshal(buff, spec)
 	if err != nil {
 		return json
 	}
-	c := &ParseContext{json: json}
+	c := &parseContext{json: json}
 	for _, val := range spec.MappingConfig {
 		if val.Group != nil {
 			c.group = true
-			MappingContext(c, *val.Group)
+			mappingContext(c, *val.Group)
 		}
 		if val.Pairs != nil {
 			if c.group {
-				MappingGroup(c, *val.Pairs)
+				mappingGroup(c, *val.Pairs)
 			} else {
-				MappingContext(c, *val.Pairs)
+				mappingContext(c, *val.Pairs)
 			}
 		}
 	}
 	return c.json
 }
 
-func MappingContext(c *ParseContext, m map[string]string) string {
+func mappingContext(c *parseContext, m map[string]string) string {
 	for path, val := range m {
 		var i int
 		mappingPairs(c, path, val, i)
@@ -64,7 +71,7 @@ func MappingContext(c *ParseContext, m map[string]string) string {
 	return c.json
 }
 
-func MappingGroup(c *ParseContext, m map[string]string) string {
+func mappingGroup(c *parseContext, m map[string]string) string {
 	for path, val := range m {
 		i := c.groupIndex
 		mappingPairs(c, path, val, i)
@@ -74,7 +81,7 @@ func MappingGroup(c *ParseContext, m map[string]string) string {
 	return c.json
 }
 
-func mappingPairs(c *ParseContext, path, val string, i int) {
+func mappingPairs(c *parseContext, path, val string, i int) {
 	c.val = val
 	for ; i < len(c.json); i++ {
 		if c.json[i] == '{' {
@@ -90,12 +97,12 @@ func mappingPairs(c *ParseContext, path, val string, i int) {
 	}
 }
 
-func mappingObject(c *ParseContext, path string, i int) {
+func mappingObject(c *parseContext, path string, i int) {
 	rp := parsePath(path)
 	parseObject(c, rp, i)
 }
 
-func mappingArray(c *ParseContext, path string, i int) {
+func mappingArray(c *parseContext, path string, i int) {
 	for ; i < len(c.json); i++ {
 		if c.json[i] == '{' {
 			i++
@@ -120,7 +127,7 @@ func parsePath(path string) (r pathResult) {
 	return
 }
 
-func parseObject(c *ParseContext, rp pathResult, i int) {
+func parseObject(c *parseContext, rp pathResult, i int) {
 	var key string
 	for ; i < len(c.json); i++ {
 		if c.json[i] == '"' {
@@ -166,7 +173,7 @@ func parseObject(c *ParseContext, rp pathResult, i int) {
 	}
 }
 
-func parseArray(c *ParseContext, rp pathResult, i int) {
+func parseArray(c *parseContext, rp pathResult, i int) {
 	for ; i < len(c.json); i++ {
 		if c.json[i] == '{' {
 			i++

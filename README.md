@@ -10,9 +10,25 @@ go get -u github.com/haihuxia/mjson
 
 ### Example
 
-mapping.yaml
+* MappingString
+
+```go
+mjson.MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name", "my_name")
+// ==> `{"my_name": {"first": "Tom", "last": "Anderson"}}`
+
+mjson.MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name.first", "fname")
+// ==> `{"name": {"fname": "Tom", "last": "Anderson"}}`
+
+mjson.MappingString(`{"friends": [{"first": "Tom", "last": "Anderson"}}, {"first": "Dale", "last": "Murphy"}}]`, "friends.first", "fname")
+// ==> `{"friends": [{"fname": "Tom", "last": "Anderson"}}, {"fname": "Dale", "last": "Murphy"}}]`
+```
+
+
+
+* MappingYAML
 
 ```yaml
+# mapping.yaml
 mapping:
   - group:
       name: nick
