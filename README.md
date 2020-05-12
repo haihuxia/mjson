@@ -1,6 +1,6 @@
 ## MJSON
 
-[![Build Status](https://travis-ci.org/haihuxia/mjson.svg?branch=master)](https://travis-ci.org/haihuxia/mjson)
+[![Build Status](https://travis-ci.org/haihuxia/mjson.svg?branch=master)](https://travis-ci.org/haihuxia/mjson)<a href="https://pkg.go.dev/github.com/haihuxia/mjson?tab=doc"><img src="https://img.shields.io/badge/api-reference-blue.svg?style=flat-square" alt="GoDoc"></a>
 
 MJSON is a Go package that provides a way to map keys from a json document.
 
