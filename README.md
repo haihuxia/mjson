@@ -87,6 +87,10 @@ This will print:
 }
 ```
 
+### Performance
+
+[mjson-benchmarks](https://github.com/haihuxia/mjson-benchmarks)
+
 ### License
 
 MJSON source code is available under the MIT [License](https://github.com/haihuxia/mjson/blob/master/LICENSE).

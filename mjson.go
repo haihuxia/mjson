@@ -1,3 +1,4 @@
+// MJSON provides a way to map keys from a json document.
 package mjson
 
 import (
@@ -29,6 +30,22 @@ type (
 	}
 )
 
+// Find the mapped key by path. A path is in dot syntax, such as "name.last" or "age".
+// When the key is found, it will be replaced by val.
+//
+//	{
+//  	"name": {"first": "Tom", "last": "Anderson"},
+//  	"age":37,
+//  	"children": ["Sara","Alex","Jack"],
+//  	"friends": [
+//    		{"first": "James", "last": "Murphy"},
+//    		{"first": "Roger", "last": "Craig"}
+//  	]
+//	}
+//
+// path: "name.first",		val: "fname"  >> 	found key "first" 		>> "name.fname"
+// path: "children", 		val: "childs" >> 	found key "children" 	>> "childs"
+// path: "friends.first", 	val: "fname"  >> 	found key "first" twice >> "friends.fname"
 func MappingString(json, path, val string) string {
 	c := &parseContext{json: json}
 	var i int
