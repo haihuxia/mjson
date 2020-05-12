@@ -23,9 +23,15 @@ mjson.MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name.firs
 
 mjson.MappingString(`{"friends": [{"first": "Tom", "last": "Anderson"}, {"first": "Dale", "last": "Murphy"}]}`, "friends.first", "fname")
 // ==> `{"friends": [{"fname": "Tom", "last": "Anderson"}, {"fname": "Dale", "last": "Murphy"}]}`
+
+mjson.MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "abc", "my_name")
+// ==> `{"name": {"first": "Tom", "last": "Anderson"}}`
+// Can't find "abc" path map nothing
+
+mjson.MappingString(`{"friends": [{"first": "Dale", "last": "Murphy", "age1": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}}]}`, "friends.nets", "abc_nets")
+// ==> `{"friends": [{"first": "Dale", "last": "Murphy", "age1": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}}]}`
+// Can't find "friends.nets" path map nothing
 ```
-
-
 
 * MappingYAML
 

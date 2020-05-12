@@ -178,6 +178,8 @@ func parseArray(c *parseContext, rp pathResult, i int) {
 		if c.json[i] == '{' {
 			i++
 			parseObject(c, rp, i)
+		} else if c.json[i] == ']' {
+			break
 		}
 	}
 }
@@ -224,11 +226,14 @@ func jumpString(json string, i int) int {
 
 func jumpObject(json string, i int) int {
 	depth := 1
-	for ; i < len(json) && depth > 0; i++ {
+	for ; i < len(json); i++ {
 		if json[i] == '{' {
 			depth++
 		} else if json[i] == '}' {
 			depth--
+			if depth <= 0 {
+				break
+			}
 		}
 	}
 	return i

@@ -12,9 +12,9 @@ const json = `{
   "children": ["Sara","Alex","Jack"],
   "fav.movie": "Deer Hunter",
   "friends": [
-    {"first": "Dale", "last": "Murphy", "age1": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}},
-    {"first": "Roger", "last": "Craig", "age1": 68, "abc": {"nets": ["fb", "tw"], "abc": {"bbb": "ccc"}}},
-    {"first": "Jane", "last": "Murphy", "age1": 47, "abc": {"nets": ["ig", "tw"], "abc": {"bbb": "ccc"}}}
+    {"first": "Dale", "last": "Murphy", "age": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}},
+    {"first": "Roger", "last": "Craig", "age": 68, "abc": {"nets": ["fb", "tw"], "abc": {"bbb": "ccc"}}},
+    {"first": "Jane", "last": "Murphy", "age": 47, "abc": {"nets": ["ig", "tw"], "abc": {"bbb": "ccc"}}}
   ]
 }`
 
@@ -60,8 +60,6 @@ func TestMapping(t *testing.T) {
 
 	jsonStr = MappingString(jsonStr, "friends.first", "first_name")
 
-	jsonStr = MappingString(jsonStr, "friends.abc.nets", "abc_nets")
-
 	t.Log(jsonStr)
 
 	t.Log(MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name", "my_name"))
@@ -75,4 +73,12 @@ func TestMapping(t *testing.T) {
 
 func TestMappingYAML(t *testing.T) {
 	t.Log(MappingYAML(json, "mapping.yaml"))
+}
+
+func TestMappingStringErrorKey(t *testing.T) {
+	t.Log(MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "abc", "my_name"))
+
+	t.Log(MappingString(json, "friends.abc.nets.abc", "aaa"))
+
+	t.Log(MappingString(json, "friends.nets", "abc_nets"))
 }
