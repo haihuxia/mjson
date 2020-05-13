@@ -9,6 +9,6 @@ mapping:
       children: my_children
       fav\.movie: fav_movie
   - group:
-      friends: _
+      friends: my_friends
     pairs:
       first: first_name

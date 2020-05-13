@@ -188,13 +188,13 @@ func parseObject(c *parseContext, rp pathResult, i int) {
 			key, i = parseJSONKey(c.json, i)
 			if rp.part == key {
 				if !rp.more {
-					if c.group && c.groupIndex == 0 {
-						c.groupIndex = i
-					}
 					if c.val != "_" {
 						s := i - len(key) - 1
 						c.json = c.json[:s] + c.val + c.json[i-1:]
 						i = s + len(c.val) + 1
+					}
+					if c.group && c.groupIndex == 0 {
+						c.groupIndex = i
 					}
 					break
 				}
