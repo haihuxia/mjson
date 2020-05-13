@@ -35,20 +35,20 @@ type (
 // When the key is found, it will be replaced by val.
 //
 //	{
-//  	"name": {"first": "Tom", "last": "Anderson"},
-//  	"age":37,
-//  	"children": ["Sara","Alex","Jack"],
-//		"fav.movie": "Deer Hunter"
-//  	"friends": [
-//    		{"first": "James", "last": "Murphy"},
-//    		{"first": "Roger", "last": "Craig"}
-//  	]
+//	  "name": {"first": "Tom", "last": "Anderson"},
+//	  "age":37,
+//	  "children": ["Sara","Alex","Jack"],
+//	  "fav.movie": "Deer Hunter"
+//	  "friends": [
+//	    {"first": "James", "last": "Murphy"},
+//	    {"first": "Roger", "last": "Craig"}
+//	  ]
 //	}
 //
-// path: "name.first",	  val: "fname"  	 >> found key "first" 		>> replace with "name.fname"
-// path: "children", 	  val: "my_children" >> found key "children" 	>> replace with "my_children"
-// path: "fav.movie"	  val: "fav_movie"	 >> found key "fav.movie"   >> replace with "fav_movie"
-// path: "friends.first", val: "fname"       >> found key "first" twice >> replace all with "friends.fname"
+//	path: "name.first",    val: "fname"       >> found key "first"       >> replace with "name.fname"
+//	path: "children",      val: "my_children" >> found key "children"    >> replace with "my_children"
+//	path: "fav.movie"      val: "fav_movie"   >> found key "fav.movie"   >> replace with "fav_movie"
+//	path: "friends.first", val: "fname"       >> found key "first" twice >> replace all with "friends.fname"
 func MappingString(json, path, val string) string {
 	c := &parseContext{json: json}
 	var i int
@@ -79,25 +79,25 @@ func MappingSpec(json string, spec *Spec) string {
 // mapping.yaml
 //
 //	mapping:
-//  - group:
-//      name: nick
-//    pairs:
-//      first: fname
-//      last: lname
-//  - pairs:
-//      age: my_age
-//      children: my_children
-//      fav\.movie: fav_movie
-//      friends.first: fname
+//	  - group:
+//	      name: nick
+//	    pairs:
+//	      first: fname
+//	      last: lname
+//	  - pairs:
+//	      age: my_age
+//	      children: my_children
+//	      fav\.movie: fav_movie
+//	      friends.first: fname
 //
 // The grouping is based on the key of the object or array.
 // If the group name does not need to be mapped, you can use the underscore as the value.
 //
 //	mapping:
-//	- group:
-//		name: _
-//	  pairs:
-//		first: fname
+//	  - group:
+//	      name: _
+//	    pairs:
+//	      first: fname
 func MappingYAML(json string, filePath string) string {
 	buff, err := ioutil.ReadFile(filePath)
 	if err != nil {
