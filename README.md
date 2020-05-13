@@ -44,8 +44,8 @@ mapping:
       first: fname
       last: lname
   - pairs:
-      children: childs
-  - pairs:
+      children: my_children
+      fav\.movie: fav_movie
       friends.first: fname
 ```
 
@@ -58,7 +58,7 @@ const json = `{
   "name": {"first": "last", "last": "Anderson"},
   "age":37,
   "children": ["Sara","Alex","Jack"],
-  "fav.movie": "Deer Hunter",
+  "fav_movie": "Deer Hunter",
   "friends": [
     {"first": "Dale", "last": "Murphy", "age": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}},
     {"first": "Roger", "last": "Craig", "age": 68, "abc": {"nets": ["fb", "tw"], "abc": {"bbb": "ccc"}}},
@@ -77,7 +77,7 @@ This will print:
 {
   "nick": {"fname": "last", "lname": "Anderson"},
   "age":37,
-  "childs": ["Sara","Alex","Jack"],
+  "my_children": ["Sara","Alex","Jack"],
   "fav.movie": "Deer Hunter",
   "friends": [
     {"fname": "Dale", "last": "Murphy", "age": 44, "abc": {"nets": ["ig", "fb", "tw"], "abc": {"bbb": "ccc"}}},

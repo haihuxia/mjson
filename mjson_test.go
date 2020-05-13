@@ -1,8 +1,6 @@
 package mjson
 
 import (
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"testing"
 )
 
@@ -18,57 +16,12 @@ const json = `{
   ]
 }`
 
-func TestMappingFromYAML(t *testing.T) {
-	buff, err := ioutil.ReadFile("mapping.yaml")
-	if err != nil {
-		t.Errorf("read file failed: %v", err)
-		return
-	}
-	spec := &Spec{}
-	err = yaml.Unmarshal(buff, spec)
-	if err != nil {
-		t.Errorf("unmarshal %s to yaml failed: %v", buff, err)
-		return
-	}
-	c := &parseContext{json: json}
-	for _, val := range spec.MappingConfig {
-		if val.Group != nil {
-			c.group = true
-			mappingContext(c, *val.Group)
-			for k, v := range *val.Group {
-				t.Logf("key: %s, val: %v", k, v)
-			}
-		}
-		if val.Pairs != nil {
-			if c.group {
-				mappingGroup(c, *val.Pairs)
-			} else {
-				mappingContext(c, *val.Pairs)
-			}
-			for k1, v1 := range *val.Pairs {
-				t.Logf("k1: %s, v1: %s", k1, v1)
-			}
-		}
-	}
-	t.Log(c.json)
-}
-
 func TestMapping(t *testing.T) {
-	jsonStr := MappingString(json, "name", "my_name")
-
-	jsonStr = MappingString(jsonStr, "name.last", "my_name")
-
-	jsonStr = MappingString(jsonStr, "friends.first", "first_name")
-
-	t.Log(jsonStr)
-
 	t.Log(MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name", "my_name"))
-
 	t.Log(MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name.first", "fname"))
-
 	t.Log(MappingString(
 		`{"friends": [{"first": "Tom", "last": "Anderson"}}, {"first": "Dale", "last": "Murphy"}}]`,
-		"friends.first", "fname"))
+		"friends.first", "first_name"))
 }
 
 func TestMappingYAML(t *testing.T) {
@@ -76,9 +29,23 @@ func TestMappingYAML(t *testing.T) {
 }
 
 func TestMappingStringErrorKey(t *testing.T) {
+	// Can't find "abc" path map nothing
 	t.Log(MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "abc", "my_name"))
 
+	// Can't find "friends.abc.nets.abc" path map nothing
 	t.Log(MappingString(json, "friends.abc.nets.abc", "aaa"))
 
+	// Can't find "friends.nets" path map nothing
 	t.Log(MappingString(json, "friends.nets", "abc_nets"))
+}
+
+func TestParsePath(t *testing.T) {
+	path := "abc\\.bbb"
+	t.Logf("%#v", parsePath(path))
+
+	path = "abc\\.bbb.ccc"
+	t.Logf("%#v", parsePath(path))
+
+	path = "abc.bbb.ccc"
+	t.Logf("%#v", parsePath(path))
 }

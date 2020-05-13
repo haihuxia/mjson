@@ -5,7 +5,7 @@ mapping:
       first: fname
       last: lname
   - pairs:
-      children: childs
       age: my_age
-  - pairs:
+      children: my_children
+      fav\.movie: fav_movie
       friends.first: fname

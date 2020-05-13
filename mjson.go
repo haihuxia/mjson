@@ -31,21 +31,24 @@ type (
 )
 
 // Find the mapped key by path. A path is in dot syntax, such as "name.last" or "age".
+// If the key contains a dot, it can be escaped by "\", such as "fav\.movie".
 // When the key is found, it will be replaced by val.
 //
 //	{
 //  	"name": {"first": "Tom", "last": "Anderson"},
 //  	"age":37,
 //  	"children": ["Sara","Alex","Jack"],
+//		"fav.movie": "Deer Hunter"
 //  	"friends": [
 //    		{"first": "James", "last": "Murphy"},
 //    		{"first": "Roger", "last": "Craig"}
 //  	]
 //	}
 //
-// path: "name.first",		val: "fname"  >> 	found key "first" 		>> "name.fname"
-// path: "children", 		val: "childs" >> 	found key "children" 	>> "childs"
-// path: "friends.first", 	val: "fname"  >> 	found key "first" twice >> "friends.fname"
+// path: "name.first",	  val: "fname"  	 >> found key "first" 		>> replace with "name.fname"
+// path: "children", 	  val: "my_children" >> found key "children" 	>> replace with "my_children"
+// path: "fav.movie"	  val: "fav_movie"	 >> found key "fav.movie"   >> replace with "fav_movie"
+// path: "friends.first", val: "fname"       >> found key "first" twice >> replace all with "friends.fname"
 func MappingString(json, path, val string) string {
 	c := &parseContext{json: json}
 	var i int
@@ -71,6 +74,30 @@ func MappingSpec(json string, spec *Spec) string {
 	return c.json
 }
 
+// The YAML file can be used for group configuration, and the group mapping speed is faster.
+//
+// mapping.yaml
+//
+//	mapping:
+//  - group:
+//      name: nick
+//    pairs:
+//      first: fname
+//      last: lname
+//  - pairs:
+//      age: my_age
+//      children: my_children
+//      fav\.movie: fav_movie
+//      friends.first: fname
+//
+// The grouping is based on the key of the object or array.
+// If the group name does not need to be mapped, you can use the underscore as the value.
+//
+//	mapping:
+//	- group:
+//		name: _
+//	  pairs:
+//		first: fname
 func MappingYAML(json string, filePath string) string {
 	buff, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -134,17 +161,31 @@ func mappingArray(c *parseContext, path string, i int) {
 }
 
 func parsePath(path string) (r pathResult) {
+	var s int
 	for i := 0; i < len(path); i++ {
-		if path[i] == '.' {
-			r.part = path[:i]
+		if path[i] > '\\' {
+			continue
+		}
+		if path[i] == '\\' {
+			s = i
+			i++
+			continue
+		} else if path[i] == '.' {
+			if s > 0 {
+				r.part = path[:s] + path[s+1:i]
+			} else {
+				r.part = path[:i]
+			}
 			r.path = path[i+1:]
 			r.more = true
 			return
 		}
 	}
-	if len(r.path) == 0 {
-		r.part = path
+	if s > 0 {
+		r.part = path[:s] + path[s+1:]
+		return
 	}
+	r.part = path
 	return
 }
 
@@ -167,31 +208,29 @@ func parseObject(c *parseContext, rp pathResult, i int) {
 					break
 				}
 				for ; i < len(c.json); i++ {
-					if c.json[i] == '{' {
-						if !rp.more {
-							return
-						}
+					switch c.json[i] {
+					case '"':
+						return
+					case '{':
 						rp = parsePath(rp.path)
 						i++
 						parseObject(c, rp, i)
 						return
-					} else if c.json[i] == '"' {
-						return
-					} else if c.json[i] == '}' {
-						return
-					} else if c.json[i] == '[' {
+					case '[':
 						rp = parsePath(rp.path)
 						parseArray(c, rp, i)
+						return
+					case ']', '}':
 						return
 					}
 				}
 			} else {
 				i = jumpJSONValue(c.json, i)
 			}
-		} else if c.json[i] == '}' {
-			return
 		} else if c.json[i] == '{' {
 			i = jumpObject(c.json, i)
+		} else if c.json[i] == '}' {
+			return
 		}
 	}
 }
@@ -212,11 +251,9 @@ func parseJSONKey(json string, i int) (string, int) {
 	var s = i
 	var key string
 	for ; i < len(json); i++ {
-		if json[i] > '\\' {
-			continue
-		} else if json[i] == '"' {
+		if json[i] == '"' {
 			i, key = i+1, json[s:i]
-			break
+			return key, i
 		}
 	}
 	return key, i
@@ -224,39 +261,46 @@ func parseJSONKey(json string, i int) (string, int) {
 
 func jumpJSONValue(json string, i int) int {
 	for ; i < len(json); i++ {
-		if json[i] == '"' {
+		switch json[i] {
+		default:
+			continue
+		case '"':
 			i++
-			i = jumpString(json, i)
-			break
-		} else if json[i] == '{' {
+			return jumpString(json, i)
+		case '{':
 			i++
-			i = jumpObject(json, i)
-			break
-		} else if json[i] == '[' {
+			return jumpObject(json, i)
+		case '[':
 			i++
-			i = jumpArray(json, i)
-			break
-		} else if json[i] == ',' {
-			break
+			return jumpArray(json, i)
+		case ',':
+			return i
 		}
 	}
 	return i
 }
 
 func jumpString(json string, i int) int {
-	_, i = parseJSONKey(json, i)
+	for ; i < len(json); i++ {
+		if json[i] == '"' {
+			return i + 1
+		}
+	}
 	return i
 }
 
 func jumpObject(json string, i int) int {
 	depth := 1
 	for ; i < len(json); i++ {
+		if json[i] < '{' {
+			continue
+		}
 		if json[i] == '{' {
 			depth++
 		} else if json[i] == '}' {
 			depth--
 			if depth <= 0 {
-				break
+				return i
 			}
 		}
 	}
@@ -266,7 +310,7 @@ func jumpObject(json string, i int) int {
 func jumpArray(json string, i int) int {
 	for ; i < len(json); i++ {
 		if json[i] == ']' {
-			break
+			return i
 		}
 	}
 	return i
