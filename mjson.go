@@ -139,7 +139,8 @@ func mappingPairs(c *parseContext, path, val string, i int) {
 		}
 		if c.json[i] == '[' {
 			i++
-			mappingArray(c, path, i)
+			rp := parsePath(path)
+			parseArray(c, rp, i)
 			break
 		}
 	}
@@ -148,16 +149,6 @@ func mappingPairs(c *parseContext, path, val string, i int) {
 func mappingObject(c *parseContext, path string, i int) {
 	rp := parsePath(path)
 	parseObject(c, rp, i)
-}
-
-func mappingArray(c *parseContext, path string, i int) {
-	for ; i < len(c.json); i++ {
-		if c.json[i] == '{' {
-			i++
-			mappingObject(c, path, i)
-			return
-		}
-	}
 }
 
 func parsePath(path string) (r pathResult) {

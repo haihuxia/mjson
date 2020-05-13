@@ -16,6 +16,12 @@ const json = `{
   ]
 }`
 
+const jsonArray = `[
+  {"first": "Dale", "last": "Murphy"},
+  {"first": "Roger", "last": "Craig"},
+  {"first": "Jane", "last": "Murphy"}
+]`
+
 func TestMapping(t *testing.T) {
 	t.Log(MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name", "my_name"))
 	t.Log(MappingString(`{"name": {"first": "Tom", "last": "Anderson"}}`, "name.first", "fname"))
@@ -26,6 +32,10 @@ func TestMapping(t *testing.T) {
 
 func TestMappingYAML(t *testing.T) {
 	t.Log(MappingYAML(json, "mapping.yaml"))
+}
+
+func TestMappingArray(t *testing.T) {
+	t.Log(MappingString(jsonArray, "first", "first_name"))
 }
 
 func TestMappingStringErrorKey(t *testing.T) {

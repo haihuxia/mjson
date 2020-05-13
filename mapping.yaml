@@ -8,4 +8,7 @@ mapping:
       age: my_age
       children: my_children
       fav\.movie: fav_movie
-      friends.first: fname
+  - group:
+      friends: _
+    pairs:
+      first: first_name
