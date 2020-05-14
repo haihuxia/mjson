@@ -4,14 +4,16 @@ package mjson
 import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"reflect"
+	"unsafe"
 )
 
 type (
-	Spec struct {
-		MappingConfig []*mappingConfig `yaml:"mapping"`
+	spec struct {
+		Mappings []*MappingConfig `yaml:"mapping"`
 	}
 
-	mappingConfig struct {
+	MappingConfig struct {
 		Group *map[string]string `yaml:"group"`
 		Pairs *map[string]string `yaml:"pairs"`
 	}
@@ -56,9 +58,9 @@ func MappingString(json, path, val string) string {
 	return c.json
 }
 
-func MappingSpec(json string, spec *Spec) string {
+func Mapping(json string, m []*MappingConfig) string {
 	c := &parseContext{json: json}
-	for _, val := range spec.MappingConfig {
+	for _, val := range m {
 		if val.Group != nil {
 			c.group = true
 			mappingContext(c, *val.Group)
@@ -103,12 +105,24 @@ func MappingYAML(json string, filePath string) string {
 	if err != nil {
 		return json
 	}
-	spec := &Spec{}
-	err = yaml.Unmarshal(buff, spec)
+	s := &spec{}
+	err = yaml.Unmarshal(buff, s)
 	if err != nil {
 		return json
 	}
-	return MappingSpec(json, spec)
+	return Mapping(json, s.Mappings)
+}
+
+func StringToBytes(s string) []byte {
+	return *(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: (*reflect.StringHeader)(unsafe.Pointer(&s)).Data,
+		Len:  len(s),
+		Cap:  len(s),
+	}))
+}
+
+func BytesToString(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
 }
 
 func mappingContext(c *parseContext, m map[string]string) string {

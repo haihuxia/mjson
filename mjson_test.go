@@ -59,3 +59,9 @@ func TestParsePath(t *testing.T) {
 	path = "abc.bbb.ccc"
 	t.Logf("%#v", parsePath(path))
 }
+
+func TestStringBytes(t *testing.T) {
+	b := StringToBytes(json)
+	s := BytesToString(b)
+	t.Log(s)
+}
